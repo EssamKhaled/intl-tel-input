@@ -48,7 +48,9 @@
         // display the country dial code next to the selected flag so it's not part of the typed number
         separateDialCode: false,
         // specify the path to the libphonenumber script to enable validation/formatting
-        utilsScript: ""
+        utilsScript: "",
+        // display input to help searching for specific country
+        allowCountrySearch: false
     }, keys = {
         UP: 38,
         DOWN: 40,
@@ -204,6 +206,9 @@
             if (this.options.separateDialCode) {
                 parentClass += " separate-dial-code";
             }
+            if (this.options.allowCountrySearch) {
+                parentClass += " allow-country-search";
+            }
             this.telInput.wrap($("<div>", {
                 "class": parentClass
             }));
@@ -234,6 +239,25 @@
                 this.countryList = $("<ul>", {
                     "class": "country-list hide"
                 });
+                if (this.options.allowCountrySearch) {
+                    var placeholder = this.options.countrySearchPlaceholder ? this.options.countrySearchPlaceholder : "";
+                    this.countrySearchContainer = $("<div>", {
+                        "class": "country-search-container hide"
+                    });
+                    this.countrySearch = $("<div>", {
+                        "class": "country-search"
+                    });
+                    this.countrySearchInput = $("<input>", {
+                        type: "text",
+                        "class": "country-search-input",
+                        placeholder: placeholder
+                    });
+                    this.countrySearch.append($("<span>", {
+                        "class": "country-search-icon"
+                    }));
+                    this.countrySearch.append(this.countrySearchInput).appendTo(this.countrySearchContainer);
+                    this.countrySearchContainer.appendTo(this.flagsContainer);
+                }
                 if (this.preferredCountries.length) {
                     this._appendListItems(this.preferredCountries, "preferred");
                     $("<li>", {
@@ -505,6 +529,9 @@
             this._bindDropdownListeners();
             // update the arrow
             this.selectedFlagInner.children(".iti-arrow").addClass("up");
+            if (this.options.allowCountrySearch) {
+                this.countrySearchInput.focus();
+            }
         },
         // decide where to position dropdown (depends on position within viewport, and scroll)
         _setDropdownPosition: function() {
@@ -514,6 +541,9 @@
             }
             // show the menu and grab the dropdown height
             this.dropdownHeight = this.countryList.removeClass("hide").outerHeight();
+            if (this.options.allowCountrySearch) {
+                this.countrySearchContainer.removeClass("hide");
+            }
             if (!this.isMobile) {
                 var pos = this.telInput.offset(), inputTop = pos.top, windowTop = $(window).scrollTop(), // dropdownFitsBelow = (dropdownBottom < windowBottom)
                 dropdownFitsBelow = inputTop + this.telInput.outerHeight() + this.dropdownHeight < windowTop + $(window).height(), dropdownFitsAbove = inputTop - this.dropdownHeight > windowTop;
@@ -552,6 +582,10 @@
             // we cannot just stopPropagation as it may be needed to close another instance
             var isOpening = true;
             $("html").on("click" + this.ns, function(e) {
+                // check if country search is enabled then don't close the drop down.
+                if (that.options.allowCountrySearch && $(e.toElement).hasClass("country-search-input")) {
+                    return false;
+                }
                 if (!isOpening) {
                     that._closeDropdown();
                 }
@@ -563,9 +597,12 @@
             // listen on the document because that's where key events are triggered if no input has focus
             var query = "", queryTimer = null;
             $(document).on("keydown" + this.ns, function(e) {
-                // prevent down key from scrolling the whole page,
-                // and enter key from submitting a form etc
-                e.preventDefault();
+                // handle the country search before the regular country filtration
+                if (that.options.allowCountrySearch == false) {
+                    // prevent down key from scrolling the whole page,
+                    // and enter key from submitting a form etc
+                    e.preventDefault();
+                }
                 if (e.which == keys.UP || e.which == keys.DOWN) {
                     // up and down to navigate
                     that._handleUpDownKey(e.which);
@@ -576,17 +613,23 @@
                     // esc to close
                     that._closeDropdown();
                 } else if (e.which >= keys.A && e.which <= keys.Z || e.which == keys.SPACE) {
-                    // upper case letters (note: keyup/keydown only return upper case letters)
-                    // jump to countries that start with the query string
-                    if (queryTimer) {
-                        clearTimeout(queryTimer);
+                    if (that.options.allowCountrySearch) {
+                        setTimeout(function() {
+                            that._searchForCountry(that.countrySearchInput.val().toUpperCase());
+                        }, 1);
+                    } else {
+                        // upper case letters (note: keyup/keydown only return upper case letters)
+                        // jump to countries that start with the query string
+                        if (queryTimer) {
+                            clearTimeout(queryTimer);
+                        }
+                        query += String.fromCharCode(e.which);
+                        that._searchForCountry(query);
+                        // if the timer hits 1 second, reset the query
+                        queryTimer = setTimeout(function() {
+                            query = "";
+                        }, 1e3);
                     }
-                    query += String.fromCharCode(e.which);
-                    that._searchForCountry(query);
-                    // if the timer hits 1 second, reset the query
-                    queryTimer = setTimeout(function() {
-                        query = "";
-                    }, 1e3);
                 }
             });
         },
@@ -774,6 +817,10 @@
         // close the dropdown and unbind any listeners
         _closeDropdown: function() {
             this.countryList.addClass("hide");
+            if (this.options.allowCountrySearch) {
+                this.countrySearchContainer.addClass("hide");
+                this.countrySearchInput.val("");
+            }
             // update the arrow
             this.selectedFlagInner.children(".iti-arrow").removeClass("up");
             // unbind key events
