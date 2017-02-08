@@ -50,7 +50,11 @@
         // specify the path to the libphonenumber script to enable validation/formatting
         utilsScript: "",
         // display input to help searching for specific country
-        allowCountrySearch: false
+        allowCountrySearch: false,
+        // country search input placeholder
+        countrySearchPlaceholder: "",
+        // country search input magnifier Icon
+        searchIcon: ""
     }, keys = {
         UP: 38,
         DOWN: 40,
@@ -241,6 +245,7 @@
                 });
                 if (this.options.allowCountrySearch) {
                     var placeholder = this.options.countrySearchPlaceholder ? this.options.countrySearchPlaceholder : "";
+                    var searchIcon = this.options.searchIcon ? this.options.searchIcon : "";
                     this.countrySearchContainer = $("<div>", {
                         "class": "country-search-container hide"
                     });
@@ -249,7 +254,7 @@
                     });
                     this.countrySearchInput = $("<input>", {
                         type: "text",
-                        "class": "country-search-input",
+                        "class": "country-search-input " + searchIcon,
                         placeholder: placeholder
                     });
                     this.countrySearch.append($("<span>", {
