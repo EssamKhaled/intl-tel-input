@@ -254,11 +254,11 @@
                     });
                     this.countrySearchInput = $("<input>", {
                         type: "text",
-                        "class": "country-search-input " + searchIcon,
+                        "class": "country-search-input",
                         placeholder: placeholder
                     });
                     this.countrySearch.append($("<span>", {
-                        "class": "country-search-icon"
+                        "class": "country-search-icon " + searchIcon
                     }));
                     this.countrySearch.append(this.countrySearchInput).appendTo(this.countrySearchContainer);
                     this.countrySearchContainer.appendTo(this.flagsContainer);

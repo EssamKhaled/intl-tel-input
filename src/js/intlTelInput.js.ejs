@@ -279,8 +279,8 @@ Plugin.prototype = {
         var searchIcon = this.options.searchIcon ? this.options.searchIcon : "";
         this.countrySearchContainer = $("<div>", {"class": "country-search-container hide"});
         this.countrySearch = $("<div>", {"class": "country-search"});
-        this.countrySearchInput = $("<input>", {"type": "text", "class": "country-search-input " + searchIcon, "placeholder": placeholder});
-        this.countrySearch.append($("<span>", {"class": "country-search-icon"}));
+        this.countrySearchInput = $("<input>", {"type": "text", "class": "country-search-input", "placeholder": placeholder});
+        this.countrySearch.append($("<span>", {"class": "country-search-icon " + searchIcon}));
         this.countrySearch.append(this.countrySearchInput).appendTo(this.countrySearchContainer);
         this.countrySearchContainer.appendTo(this.flagsContainer);
       }
