@@ -554,6 +554,9 @@
                 dropdownFitsBelow = inputTop + this.telInput.outerHeight() + this.dropdownHeight < windowTop + $(window).height(), dropdownFitsAbove = inputTop - this.dropdownHeight > windowTop;
                 // by default, the dropdown will be below the input. If we want to position it above the input, we add the dropup class.
                 this.countryList.toggleClass("dropup", !dropdownFitsBelow && dropdownFitsAbove);
+                if (this.options.allowCountrySearch) {
+                    this.countrySearchContainer.toggleClass("dropup", !dropdownFitsBelow && dropdownFitsAbove);
+                }
                 // if dropdownContainer is enabled, calculate postion
                 if (this.options.dropdownContainer) {
                     // by default the dropdown will be directly over the input because it's not in the flow. If we want to position it below, we need to add some extra top value.

@@ -220,12 +220,15 @@ $mobilePopupMargin: 30px;
       margin: 1px 0;
       width: 338px;
       top: 5px;
+      &.dropup {
+        top: -237px;
+      }
       .country-search {
         position: relative;
         margin: 6px;
         border: 1px solid #CCC;
         .country-search-input {
-          width: 90%;
+          width: 83%;
           padding: 5px;
           border: initial;
           padding-left: 0!important;
